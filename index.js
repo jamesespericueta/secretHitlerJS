@@ -15,14 +15,30 @@ const client = new DiscordJS.Client({
         Intents.FLAGS.GUILD_MESSAGES
     ]
 });
+const nameAllPlayers = () =>
+{
+    console.log(playerArr);
+    let playerNames ='';
+    playerArr.forEach(user => {
+        if(playerArr.indexOf(user) == playerArr.length--)
+        {
+            playerNames += user.username;
+        }
+        else 
+        {
+            playerNames += user.username + ", ";
+        }
+    });
+    return playerNames;
+}
 
 client.on('messageCreate', (message) => {
     if(!message.content.startsWith(prefix) || message.author.bot) return;
     
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
-
-    if(command === 'startgame')
+    //initializing game
+    if(command === 'initgame')
     {
         if(gameIsOngoing)
         {
@@ -33,25 +49,48 @@ client.on('messageCreate', (message) => {
             isAddingPlayers = true;
         }
     }
+    //joining game process
     else if(command === 'joingame')
     {
         if(isAddingPlayers)
         {
-            let playerid = message.author.id;
-            if(!playerArr.includes(playerid))
+            //check if theres already player limit
+            if(playerArr.length <= 10)
             {
-                playerArr.push(playerid);
+                let player = message.author;
+                if(!playerArr.includes(player))
+                {
+                    playerArr.push(player);
+                }
+                else 
+                {
+                    message.reply("You are already a part of the game");
+                }
+
             }
-            else 
-            {
-                message.reply("You are already a part of the game");
-            }
-            console.log(playerArr);
+            console.log(nameAllPlayers());
         }
         else 
         {
             message.channel.send("Game is either happening or not started");
         }
+    }
+    //actually starting the game
+    else if(command === 'startgame')
+    {
+        if(isAddingPlayers)
+        {
+            if(playerArr.length >= 5 && playerArr.length <= 10)
+            {
+                isAddingPlayers = false;
+                message.channel.send('The players participating are ' + nameAllPlayers);
+            }
+            else
+            {
+                    message.reply("There aren't enought participants");
+            }
+        }
+
     }    
 })
 
@@ -59,3 +98,4 @@ client.on('ready', () => {
     console.log('The mf bot is ready');
 })
 client.login(process.env.TOKEN);
+
