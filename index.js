@@ -38,22 +38,6 @@ const nameAllPlayers = () =>
     return playerNames.join(', ');
 }
 
-const designateRoles = () =>
-{
-    if(playerArr.length >= 5 && playerArr.length <= 6)
-    {
-
-    }
-    else if(playerArr.length >= 7 && playerArr.length <= 8)
-    {
-
-    }
-    else
-    {
-
-    }
-}
-
 
 //processing the commands
 client.on('messageCreate', (message) => {
