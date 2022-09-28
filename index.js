@@ -11,36 +11,16 @@ LEts think this through
 maybe we dont have to make an object because there are only two important roles
 */
 
-class Player
-{
-    constructor(isHitler, isLiberal, isFacist)
-    {
-        this.isHitler = isHitler;
-        this.isLiberal = isLiberal;
-        this.isFascist = isFascist;
-    }
-
-    isFascist()
-    {
-        return this.isFascist;
-    }
-    isLiberal()
-    {
-        return this.isLiberal;
-    }
-    isHitler()
-    {
-        return this.isHitler;
-    }
-}
 
 const prefix = '!'
 
 let gameIsOngoing = false;
 let playerArr = [];
+let poppedArr = [];
 let isAddingPlayers = false;
-
-
+let hitler;
+let liberals = [];
+let fascists = [];
 const client = new DiscordJS.Client({
     intents: [
         Intents.FLAGS.GUILDS,
@@ -53,7 +33,7 @@ const nameAllPlayers = () =>
 {
     let playerNames = [];
     playerArr.forEach(user => {
-        playerNames.push(user.username);
+        playerNames.push(user);
     });
     return playerNames.join(', ');
 }
@@ -101,6 +81,19 @@ client.on('messageCreate', (message) => {
             //check if theres already user limit
             if(playerArr.length <= 10)
             {
+				if(args.length == 1)
+				{
+					let user = args[0];
+					if(!playerArr.includes(user))
+					{
+						playerArr.push(user);
+					}
+					else
+					{
+						message.reply("You are already part of the game");
+					}
+				}
+				/*
                 let user = message.author;
                 if(!playerArr.includes(user))
                 {
@@ -110,6 +103,7 @@ client.on('messageCreate', (message) => {
                 {
                     message.reply("You are already a part of the game");
                 }
+				*/
             }
             console.log(nameAllPlayers());
         }
@@ -126,18 +120,65 @@ client.on('messageCreate', (message) => {
             if(playerArr.length >= 5 && playerArr.length <= 10)
             {
                 isAddingPlayers = false;
-                message.channel.send('The players participating are ' + nameAllPlayers);
-
-
+                message.channel.send('The players participating are ' + nameAllPlayers());
+				gameIsOngoing = true;
+				initialize();
             }
             else
             {
-                    message.reply("You only have " + playerArr.length + "players. You need between 5 and 10 players to play");
+                    message.reply("You only have " + playerArr.length + " players. You need between 5 and 10 players to play");
             }
         }
 
     }    
 })
+
+const initialize = () =>{
+	poppedArr = playerArr;
+	chooseHitler();
+	chooseFacists();
+	chooseLiberals();
+
+}
+
+const chooseHitler = () =>{
+	let random = Math.floor(Math.random() * poppedArr.length);
+	hitler = poppedArr[random];
+}
+
+const chooseFacists = () =>{
+	if(playerArr.length == 5 || playerArr.length == 6)
+	{
+		let random = Math.floor(Math.random() * poppedArr.length);
+		let tempFascist = poppedArr[random];
+		fascists.push(tempFascist)
+		poppedArr.pop(tempFascist)
+	}
+	else if (playerArr.length == 7 || playerArr.length == 8)
+	{
+		for( let i = 0; i < 2; i++)
+		{
+			let random = Math.floor(Math.random() * poppedArr.length);
+			let tempFascist = poppedArr[random];
+			fascists.push(tempFascist);
+			poppedArr.pop(tempFascist);
+		}
+	}
+	else if (playerArr.length == 9 || playerArr.length == 10)
+	{
+		for ( let  i = 0; i < 3; i++)
+		{
+			let random = Math.floor(Math.random() * poppedArr.length);
+			let tempFascist = poppedArr[random];
+			fascists.push(tempFascist);
+			poppedArr.pop(tempFascist);
+		}
+	}
+}
+
+const chooseLiberals = () =>{
+	liberals = poppedArr;
+}
 
 
 //you can retain a game state everytime a command is thrown
