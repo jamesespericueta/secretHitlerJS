@@ -2,9 +2,9 @@ import DiscordJS, {Intents} from 'discord.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
-//TODO: Get the beginning of the bot ready for a game
-//      Get the players that want to play as part of the game where they would be stored
-// TODO: Make objects for each player so that they have a political party state
+//Personal reminder: finished working on initialize() for role decision
+//
+// TODO: Work on getting the first round setup and get the gameplay loop going
 
 /*
 LEts think this through
@@ -63,8 +63,9 @@ client.on('messageCreate', (message) => {
         if(isAddingPlayers)
         {
             //check if theres already user limit
-            if(playerArr.length <= 10)
+            if ( playerArr.length < 9 )
             {
+				console.log(playerArr.length);
 				if(args.length == 1)
 				{
 					let user = args[0];
@@ -89,6 +90,9 @@ client.on('messageCreate', (message) => {
                 }
 				*/
             }
+			else{
+				message.channel.send("The max of 10 players has been reached, no more players allowed.")
+			}
             console.log(nameAllPlayers());
         }
         else 
@@ -100,7 +104,7 @@ client.on('messageCreate', (message) => {
     else if(command === 'startgame')
     {
         if(isAddingPlayers)
-        {
+      
             if(playerArr.length >= 5 && playerArr.length <= 10)
             {
                 isAddingPlayers = false;
@@ -119,10 +123,44 @@ client.on('messageCreate', (message) => {
 
 const initialize = () =>{
 	poppedArr = playerArr;
+	chooseRoles();j
+	notify();	
+}
+
+const chooseRoles = () => {
 	chooseHitler();
 	chooseFacists();
 	chooseLiberals();
+}
 
+const notifyFacists = () => {
+	if (fascists.length > 1)
+	{
+		for (let i = 0; i < fascists.length; i ++)
+		{
+			let otherFascists = fascists;
+			otherFascists.pop(fascists[i]);
+			fascists[i].send("You are a fascist")
+		}
+	}
+	else
+	{
+		facsist[0].send("You are a fascist and " + hitler.username + " is hitler.");
+	}
+}
+const notify = () => {
+	notifyHitler();
+	notifyLiberals();
+	notifyFacists();
+}
+const notifyHitler = () => {
+	hitler.message("You are hitler!");
+}
+const notifyLiberals = () => {
+	for (let i = 0; i < liberals.length; i++)
+	{
+		liberals[i].message("You are a liberal.");
+	}
 }
 
 const chooseHitler = () =>{
