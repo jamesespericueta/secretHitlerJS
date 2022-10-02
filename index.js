@@ -4,8 +4,9 @@ dotenv.config()
 
 //Personal reminder: finished working on initialize() for role decision
 //
-// TODO: Work on getting the first round setup and get the gameplay loop going
-
+//TODO: finish the locatePlayer function and all the other empty functions for
+//the legislative session and policy dealing part of the game 
+//
 /*
 LEts think this through
 maybe we dont have to make an object because there are only two important roles
@@ -13,7 +14,9 @@ maybe we dont have to make an object because there are only two important roles
 
 
 const prefix = '!'
-
+let president;
+let chancellor;
+let lastElected;
 let gameIsOngoing = false;
 let playerArr = [];
 let poppedArr = [];
@@ -21,6 +24,10 @@ let isAddingPlayers = false;
 let hitler;
 let liberals = [];
 let fascists = [];
+let yays = 0;
+let nays = 0;
+let legislativeSession = false;
+
 const client = new DiscordJS.Client({
     intents: [
         Intents.FLAGS.GUILDS,
@@ -60,6 +67,7 @@ client.on('messageCreate', (message) => {
     //joining game process
     else if(command === 'joingame')
     {
+		// Change code to allow actual users to join once in production-----------------------------------------------------------
         if(isAddingPlayers)
         {
             //check if theres already user limit
@@ -104,7 +112,7 @@ client.on('messageCreate', (message) => {
     else if(command === 'startgame')
     {
         if(isAddingPlayers)
-      
+		{
             if(playerArr.length >= 5 && playerArr.length <= 10)
             {
                 isAddingPlayers = false;
@@ -117,15 +125,77 @@ client.on('messageCreate', (message) => {
                     message.reply("You only have " + playerArr.length + " players. You need between 5 and 10 players to play");
             }
         }
-
     }    
-})
+	else if(command === "nominate")
+	{
+		if(args.length === 1)
+		{
+			if(isEligible(args[0]))
+			{
+				chancellor = locatePlayer(args[0]);
+			}
+			else 
+			{
+				message.reply("Player either does not exist or is not eligible");
+			}
+		}
+		else
+		{
+			mesesage.channel.send("You must input one valid player to nominate chancellor");
+		}
+	}
+	else if(isElection)
+	{
+		
+		if ( command === "yay" )
+			yays++;
+		else if ( command === "nay" )
+			nays++;
+		if((nays + yays) == playerArr.length)
+		{
+			processVotes();
+		}
+	}
+	else if( legislativeSession )
+	{
+		
+	}
+});
+
+const locatePlayer = (playerUserName, message) => {
+	playerArr.forEach(currentUser => {
+		if(playerUsername.toLowerCase() == currentUser.username)
+		{
+			return currentUser;
+		}
+	})
+	
+}
+
+const dealPolicies = () => {
+	president.message("Here are your cards");
+
+}
+
+const checkEligibility = nominee => {
+	
+}
+
+processVotes = (yays, nays) => {
+	if(yays > nays)
+	{
+		
+	}
+
+}
 
 const initialize = () =>{
 	poppedArr = playerArr;
-	chooseRoles();j
-	notify();	
+	chooseRoles();
+	notify();
+	nominatePresident();
 }
+
 
 const chooseRoles = () => {
 	chooseHitler();
