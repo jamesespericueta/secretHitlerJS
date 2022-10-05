@@ -12,11 +12,13 @@ LEts think this through
 maybe we dont have to make an object because there are only two important roles
 */
 
-
+let lastElectedPres;
 const prefix = '!'
+let presidentNominee;
+let chancellorNominee;
 let president;
 let chancellor;
-let lastElected;
+let lastElectedChancellor;
 let gameIsOngoing = false;
 let playerArr = [];
 let poppedArr = [];
@@ -130,14 +132,22 @@ client.on('messageCreate', (message) => {
 	{
 		if(args.length === 1)
 		{
-			if(isEligible(args[0]))
+			if( playerExists(args[0]) )
 			{
-				chancellor = locatePlayer(args[0]);
+				if(isEligible(args[0]))
+				{
+					chancellor = locatePlayer(args[0]);
+				}
+				else 
+				{
+					message.reply("Player either does not exist or is not eligible");
+				}
 			}
 			else 
 			{
-				message.reply("Player either does not exist or is not eligible");
+				message.author.send("Player is not in the game");
 			}
+			
 		}
 		else
 		{
@@ -160,16 +170,41 @@ client.on('messageCreate', (message) => {
 	{
 		
 	}
+	else if ( command === "choosechancellor" )
+	{
+		if(message.author == presidentNominee)
+		{
+			if( args.length == 1 )
+			{
+				if( playerExists(args[0]) )
+				{
+					chancellorNominee = locatePlayer(args[0])
+				}
+				else
+				{
+					message.author.send("Player given is not in the game please check your spelling");
+				}
+			}
+			else 
+			{
+				message.author.send("Please enter only one player")
+			}
+		}
+		else
+		{
+			message.author.send("You are not the current president nominee so you cannot choose the chancellor");
+		}
+		
+	}
 });
 
-const locatePlayer = (playerUserName, message) => {
-	playerArr.forEach(currentUser => {
-		if(playerUsername.toLowerCase() == currentUser.username)
-		{
-			return currentUser;
-		}
-	})
-	
+const playerExists = playerUsername => {
+	return nameAllPlayers.toLowerCase().contains(playerUsername.toLowerCase());
+		
+}
+
+const locatePlayer = (playerUsername) => {
+
 }
 
 const dealPolicies = () => {
@@ -180,7 +215,9 @@ const dealPolicies = () => {
 const checkEligibility = nominee => {
 	
 }
-
+//set the chancellor and the president with actual power and move onto
+//the choosing of removing policy card and giving chancellor the option
+//of choosing which policy card to enact
 processVotes = (yays, nays) => {
 	if(yays > nays)
 	{
@@ -193,9 +230,14 @@ const initialize = () =>{
 	poppedArr = playerArr;
 	chooseRoles();
 	notify();
-	nominatePresident();
+	chooseFirstPres();
 }
 
+const chooseFirstPres = () => {
+	let random = Math.floor(Math.random() * poppedArr.length);
+	presidentNominee = poppedArr[random];
+	presidentNominee.send("Please choose your chancellor by typing !choose 'nameofPlayer'");
+}
 
 const chooseRoles = () => {
 	chooseHitler();
@@ -223,9 +265,11 @@ const notify = () => {
 	notifyLiberals();
 	notifyFacists();
 }
+
 const notifyHitler = () => {
 	hitler.message("You are hitler!");
 }
+
 const notifyLiberals = () => {
 	for (let i = 0; i < liberals.length; i++)
 	{
@@ -272,19 +316,9 @@ const chooseLiberals = () =>{
 	liberals = poppedArr;
 }
 
-
-//you can retain a game state everytime a command is thrown
-/*
-    For example:
-    You can just run a sequence of code everytime that a person is given a the choice of cards
-    and everytime after they choose the next person they nominate to be chancellor
-    In the end it is a finite state machine and can be paused at any moment to wait for 
-    player input to cause the machine to change state
-*/
 client.on('ready', () => {
     console.log('The mf bot is ready');
 })
-
 
 client.login(process.env.TOKEN);
 
